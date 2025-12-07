@@ -1,12 +1,11 @@
-Asistente-de-Reyna/
-│
-├── config/
-├── data/
-├── memoria/
-├── scripts/
-├── workflow/
-├── servidor/    ← AQUI VAN LOS ARCHIVOS DEL PASO 13
-│
-├── README.md
-├── comandos.md
-...
+# Servidor Base del Asistente de Reyna Vázquez
+
+Este directorio contiene la estructura inicial del backend que permitirá que el asistente funcione como un servicio API para apps móviles, webs, automatizaciones y herramientas internas.
+
+## Estructura
+
+- rutas/ → puntos de acceso
+- controladores/ → lógica que procesa solicitudes
+- servicios/ → conexiones externas (APIs, memoria, etc.)
+
+Este esqueleto servirá para construir la primera versión funcional del servidor.
