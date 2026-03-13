@@ -9,6 +9,7 @@ const vozRoutes = require('./routes/voz');
 const correosRoutes = require('./routes/correos');
 const recordatoriosRoutes = require('./routes/recordatorios');
 const authRoutes = require('./routes/auth');
+const avatarRoutes = require('./routes/avatar');
 const saludRoutes = require('./routes/salud');
 
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api/voz', vozRoutes);
 app.use('/api/correos', correosRoutes);
 app.use('/api/recordatorios', recordatoriosRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/avatar', avatarRoutes);
 app.use('/api/salud', saludRoutes);
 
 // Ruta raíz
@@ -63,6 +65,7 @@ app.listen(PORT, () => {
   console.log(`🎤 Voz: /api/voz`);
   console.log(`💬 Conversación: /api/conversacion`);
   console.log(`⏰ Recordatorios: /api/recordatorios`);
+  console.log(`🎭 Avatar: /api/avatar`);
 });
 
 module.exports = app;
