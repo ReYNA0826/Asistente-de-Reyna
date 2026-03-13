@@ -12,6 +12,8 @@ const recordatoriosRoutes = require('./routes/recordatorios');
 const authRoutes = require('./routes/auth');
 const avatarRoutes = require('./routes/avatar');
 const saludRoutes = require('./routes/salud');
+const mondayRoutes = require('./routes/monday');
+const { inicializarTablas } = require('./config/supabase');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,6 +41,7 @@ app.use('/api/recordatorios', recordatoriosRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/avatar', avatarRoutes);
 app.use('/api/salud', saludRoutes);
+app.use('/api/monday', mondayRoutes);
 
 // Interfaz web
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -52,13 +55,18 @@ app.use((err, req, res, _next) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✨ Alma está lista en http://localhost:${PORT}`);
   console.log(`📧 Correos: /api/correos`);
   console.log(`🎤 Voz: /api/voz`);
   console.log(`💬 Conversación: /api/conversacion`);
   console.log(`⏰ Recordatorios: /api/recordatorios`);
   console.log(`🎭 Avatar: /api/avatar`);
+  console.log(`📋 Monday.com: /api/monday`);
+
+  // Inicializar Supabase
+  const dbOk = await inicializarTablas();
+  console.log(dbOk ? '🗄️  Supabase: conectado' : '🗄️  Supabase: usando memoria local');
 });
 
 module.exports = app;

@@ -15,7 +15,9 @@ router.get('/', (req, res) => {
     servicios: {
       elevenlabs: !!process.env.ELEVENLABS_API_KEY,
       openai: !!process.env.OPENAI_API_KEY,
-      gmail: !!process.env.GOOGLE_CLIENT_ID
+      gmail: !!process.env.GOOGLE_CLIENT_ID,
+      supabase: !!process.env.SUPABASE_URL && !!process.env.SUPABASE_ANON_KEY,
+      monday: !!process.env.MONDAY_API_TOKEN
     },
     timestamp: new Date().toISOString()
   };
