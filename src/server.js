@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 const conversacionRoutes = require('./routes/conversacion');
 const vozRoutes = require('./routes/voz');
@@ -39,16 +40,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/avatar', avatarRoutes);
 app.use('/api/salud', saludRoutes);
 
-// Ruta raíz
-app.get('/', (req, res) => {
-  res.json({
-    nombre: 'Mi Secretaria Digital',
-    asistente: 'Alma',
-    version: '1.0.0',
-    estado: 'activo',
-    mensaje: 'Hola, soy Alma. Estoy encantada de la vida. ¿Cómo estás hoy?'
-  });
-});
+// Interfaz web
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Manejo de errores global
 app.use((err, req, res, _next) => {

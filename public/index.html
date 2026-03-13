@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alma - Tu Secretaria Digital</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      color: #e94560;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+    .header p {
+      color: #888;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+    .status-bar {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .status-item {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+    }
+    .status-item.ok { color: #4ecca3; }
+    .status-item.off { color: #e94560; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+    }
+    .tab {
+      padding: 8px 20px;
+      border: none;
+      background: transparent;
+      color: #888;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .tab:hover { color: #ccc; background: rgba(255,255,255,0.05); }
+    .tab.active { color: #e94560; background: rgba(233,69,96,0.15); }
+
+    /* Main content */
+    .main { flex: 1; display: flex; flex-direction: column; max-width: 800px; width: 100%; margin: 0 auto; padding: 16px; }
+    .panel { display: none; flex-direction: column; flex: 1; }
+    .panel.active { display: flex; }
+
+    /* Chat */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .message.user {
+      align-self: flex-end;
+      background: #e94560;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .message.alma {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.1);
+      border-bottom-left-radius: 4px;
+    }
+    .message.alma .name { color: #e94560; font-weight: 600; font-size: 0.8rem; margin-bottom: 4px; }
+
+    /* Input area */
+    .input-area {
+      display: flex;
+      gap: 8px;
+      padding: 12px 0;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .input-area input:focus { border-color: #e94560; }
+    .input-area input::placeholder { color: #666; }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: #e94560; color: white; }
+    .btn-primary:hover { background: #d63851; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: #ccc; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .btn-icon.recording { background: #e94560; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(233,69,96,0.4); } 50% { box-shadow: 0 0 0 12px rgba(233,69,96,0); } }
+
+    /* Correos panel */
+    .correo-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; padding: 8px 0; }
+    .correo-item {
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      border-left: 3px solid #e94560;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .correo-item:hover { background: rgba(255,255,255,0.1); }
+    .correo-from { font-weight: 600; font-size: 0.9rem; color: #ccc; }
+    .correo-subject { font-size: 0.85rem; color: #aaa; margin-top: 4px; }
+    .correo-date { font-size: 0.75rem; color: #666; margin-top: 4px; }
+
+    /* Recordatorios */
+    .recordatorio-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .recordatorio-form input, .recordatorio-form select {
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .recordatorio-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .recordatorio-item.completado { opacity: 0.5; text-decoration: line-through; }
+    .prioridad { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .prioridad.alta { background: #e94560; }
+    .prioridad.media { background: #f0a500; }
+    .prioridad.baja { background: #4ecca3; }
+
+    /* Info cards */
+    .info-card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .info-card h3 { color: #e94560; margin-bottom: 8px; font-size: 1rem; }
+    .info-card p { color: #aaa; font-size: 0.85rem; line-height: 1.6; }
+
+    /* Audio player */
+    .audio-player {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .audio-player button {
+      background: rgba(233,69,96,0.2);
+      border: none;
+      color: #e94560;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    /* Loading */
+    .loading { display: flex; gap: 4px; padding: 8px 0; }
+    .loading span {
+      width: 8px; height: 8px; background: #e94560; border-radius: 50%;
+      animation: bounce 1.4s infinite both;
+    }
+    .loading span:nth-child(2) { animation-delay: 0.2s; }
+    .loading span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+    .empty-state { text-align: center; color: #666; padding: 40px; font-size: 0.9rem; }
+
+    /* Gmail connect */
+    .gmail-connect {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .gmail-connect p { color: #888; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>ALMA</h1>
+    <p>Tu Secretaria Digital Personal</p>
+    <div class="status-bar" id="statusBar">
+      <span class="status-item">Cargando...</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('chat')">Chat</button>
+    <button class="tab" onclick="showPanel('correos')">Correos</button>
+    <button class="tab" onclick="showPanel('recordatorios')">Recordatorios</button>
+    <button class="tab" onclick="showPanel('avatar')">Avatar</button>
+  </div>
+
+  <div class="main">
+
+    <!-- Chat Panel -->
+    <div class="panel active" id="panel-chat">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="input-area">
+        <input type="text" id="chatInput" placeholder="Escribe un mensaje a Alma..." onkeypress="if(event.key==='Enter')sendMessage()">
+        <button class="btn btn-icon btn-secondary" id="micBtn" onclick="toggleRecording()" title="Hablar">&#127908;</button>
+        <button class="btn btn-primary" onclick="sendMessage()">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Correos Panel -->
+    <div class="panel" id="panel-correos">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h2 style="font-size:1.1rem;color:#ccc;">Correos Importantes</h2>
+        <button class="btn btn-secondary" onclick="loadCorreos()">Actualizar</button>
+      </div>
+      <div id="correosList" class="correo-list">
+        <div class="gmail-connect" id="gmailConnect">
+          <p>Conecta tu Gmail para ver correos</p>
+          <button class="btn btn-primary" onclick="connectGmail()">Conectar Gmail</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recordatorios Panel -->
+    <div class="panel" id="panel-recordatorios">
+      <div class="recordatorio-form">
+        <input type="text" id="recTitulo" placeholder="Nuevo recordatorio...">
+        <div style="display:flex;gap:8px;">
+          <input type="date" id="recFecha" style="flex:1;">
+          <input type="time" id="recHora" style="flex:1;">
+          <select id="recPrioridad" style="flex:1;">
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+            <option value="baja">Baja</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="addRecordatorio()">Agregar</button>
+      </div>
+      <h3 style="color:#ccc;font-size:0.95rem;margin-bottom:8px;">Hoy</h3>
+      <div id="recordatoriosList"></div>
+    </div>
+
+    <!-- Avatar Panel -->
+    <div class="panel" id="panel-avatar">
+      <div class="info-card">
+        <h3>Avatar de Alma (HeyGen)</h3>
+        <p>Escribe un mensaje y Alma te responde con un video de su avatar hablando.</p>
+      </div>
+      <div class="input-area">
+        <input type="text" id="avatarInput" placeholder="Escribe algo para que Alma lo diga en video..." onkeypress="if(event.key==='Enter')generateAvatar()">
+        <button class="btn btn-primary" onclick="generateAvatar()">Generar Video</button>
+      </div>
+      <div id="avatarResult" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+<script>
+const API = '';
+const USER_ID = 'reyna';
+
+// --- Panel Navigation ---
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// --- Health Check ---
+async function checkHealth() {
+  try {
+    const res = await fetch(API + '/api/salud');
+    const data = await res.json();
+    const bar = document.getElementById('statusBar');
+    const services = data.servicios;
+    bar.innerHTML = Object.entries(services).map(([key, val]) => {
+      const ok = val === true || val === 'configurado';
+      return `<span class="status-item ${ok ? 'ok' : 'off'}">${key}: ${ok ? 'OK' : 'No'}</span>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('statusBar').innerHTML = '<span class="status-item off">Servidor desconectado</span>';
+  }
+}
+
+// --- Chat ---
+function addChatMessage(text, type, audioBase64) {
+  const div = document.createElement('div');
+  div.className = 'message ' + type;
+  if (type === 'alma') {
+    div.innerHTML = '<div class="name">Alma</div>' + text;
+    if (audioBase64) {
+      const audio = new Audio('data:audio/mpeg;base64,' + audioBase64);
+      const player = document.createElement('div');
+      player.className = 'audio-player';
+      player.innerHTML = '<button onclick="this.parentElement.querySelector(\'audio\').play()">&#9654;</button> <span style="font-size:0.75rem;color:#888;">Escuchar</span>';
+      const audioEl = document.createElement('audio');
+      audioEl.src = 'data:audio/mpeg;base64,' + audioBase64;
+      player.appendChild(audioEl);
+      div.appendChild(player);
+    }
+  } else {
+    div.textContent = text;
+  }
+  document.getElementById('chatMessages').appendChild(div);
+  div.scrollIntoView({ behavior: 'smooth' });
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'message alma';
+  div.id = 'typing';
+  div.innerHTML = '<div class="name">Alma</div><div class="loading"><span></span><span></span><span></span></div>';
+  document.getElementById('chatMessages').appendChild(div);
+  div.scrollIntoView({ behavior: 'smooth' });
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  addChatMessage(text, 'user');
+  showTyping();
+
+  try {
+    const res = await fetch(API + '/api/conversacion/mensaje', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: USER_ID, mensaje: text })
+    });
+    const data = await res.json();
+    removeTyping();
+
+    // Get audio for the response
+    let audioBase64 = null;
+    try {
+      const audioRes = await fetch(API + '/api/voz/hablar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto: data.respuesta })
+      });
+      if (audioRes.ok) {
+        const audioBuffer = await audioRes.arrayBuffer();
+        audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
+      }
+    } catch(e) { /* voice optional */ }
+
+    addChatMessage(data.respuesta, 'alma', audioBase64);
+  } catch(e) {
+    removeTyping();
+    addChatMessage('Lo siento, hubo un error de conexion. Intenta de nuevo.', 'alma');
+  }
+}
+
+// --- Voice Recording ---
+let mediaRecorder = null;
+let audioChunks = [];
+
+async function toggleRecording() {
+  const btn = document.getElementById('micBtn');
+
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    btn.classList.remove('recording');
+    btn.innerHTML = '&#127908;';
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+    mediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result.split(',')[1];
+        showTyping();
+        try {
+          const res = await fetch(API + '/api/voz/conversar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: USER_ID, audio: base64, formato: 'webm' })
+          });
+          const data = await res.json();
+          removeTyping();
+          addChatMessage(data.textoUsuario, 'user');
+          addChatMessage(data.respuestaAlma, 'alma', data.audio);
+        } catch(e) {
+          removeTyping();
+          addChatMessage('Error al procesar el audio.', 'alma');
+        }
+      };
+      reader.readAsDataURL(blob);
+    };
+
+    mediaRecorder.start();
+    btn.classList.add('recording');
+    btn.innerHTML = '&#9632;';
+  } catch(e) {
+    alert('No se pudo acceder al microfono.');
+  }
+}
+
+// --- Correos ---
+async function connectGmail() {
+  try {
+    const res = await fetch(API + '/api/auth/google');
+    const data = await res.json();
+    if (data.url) window.open(data.url, '_blank');
+  } catch(e) {
+    alert('Error al conectar con Gmail.');
+  }
+}
+
+async function loadCorreos() {
+  const list = document.getElementById('correosList');
+  list.innerHTML = '<div class="empty-state">Cargando correos...</div>';
+  try {
+    const res = await fetch(API + '/api/correos/importantes?max=10');
+    const data = await res.json();
+    if (!data.correos || data.correos.length === 0) {
+      list.innerHTML = '<div class="empty-state">No hay correos nuevos importantes</div>';
+      return;
+    }
+    list.innerHTML = data.correos.map(c => `
+      <div class="correo-item">
+        <div class="correo-from">${c.de || c.from || 'Desconocido'}</div>
+        <div class="correo-subject">${c.asunto || c.subject || 'Sin asunto'}</div>
+        <div class="correo-date">${c.fecha || c.date || ''}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    list.innerHTML = `
+      <div class="gmail-connect" id="gmailConnect">
+        <p>Conecta tu Gmail para ver correos</p>
+        <button class="btn btn-primary" onclick="connectGmail()">Conectar Gmail</button>
+      </div>
+    `;
+  }
+}
+
+// --- Recordatorios ---
+async function addRecordatorio() {
+  const titulo = document.getElementById('recTitulo').value.trim();
+  if (!titulo) return;
+
+  const fecha = document.getElementById('recFecha').value || undefined;
+  const hora = document.getElementById('recHora').value || undefined;
+  const prioridad = document.getElementById('recPrioridad').value;
+
+  try {
+    await fetch(API + '/api/recordatorios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: USER_ID, titulo, fecha, hora, prioridad })
+    });
+    document.getElementById('recTitulo').value = '';
+    loadRecordatorios();
+  } catch(e) {
+    alert('Error al agregar recordatorio.');
+  }
+}
+
+async function loadRecordatorios() {
+  const list = document.getElementById('recordatoriosList');
+  try {
+    const res = await fetch(API + '/api/recordatorios/hoy/' + USER_ID);
+    const data = await res.json();
+    if (!data.recordatorios || data.recordatorios.length === 0) {
+      list.innerHTML = '<div class="empty-state">No hay recordatorios para hoy</div>';
+      return;
+    }
+    list.innerHTML = data.recordatorios.map(r => `
+      <div class="recordatorio-item ${r.completado ? 'completado' : ''}" onclick="completeRecordatorio('${r.id}')">
+        <div class="prioridad ${r.prioridad || 'media'}"></div>
+        <div style="flex:1;">
+          <div style="font-size:0.9rem;">${r.titulo}</div>
+          ${r.hora ? `<div style="font-size:0.75rem;color:#888;">${r.hora}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="empty-state">Error al cargar recordatorios</div>';
+  }
+}
+
+async function completeRecordatorio(id) {
+  try {
+    await fetch(API + '/api/recordatorios/' + USER_ID + '/' + id + '/completar', { method: 'PATCH' });
+    loadRecordatorios();
+  } catch(e) {}
+}
+
+// --- Avatar ---
+async function generateAvatar() {
+  const input = document.getElementById('avatarInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const result = document.getElementById('avatarResult');
+  result.innerHTML = '<div class="info-card"><p>Generando video... Alma esta preparando su avatar. Esto puede tomar unos segundos.</p><div class="loading"><span></span><span></span><span></span></div></div>';
+  input.value = '';
+
+  try {
+    const res = await fetch(API + '/api/avatar/conversar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: USER_ID, mensaje: text })
+    });
+    const data = await res.json();
+    result.innerHTML = `
+      <div class="info-card">
+        <h3>Respuesta de Alma</h3>
+        <p>${data.respuestaAlma}</p>
+        <p style="margin-top:12px;color:#4ecca3;font-size:0.8rem;">Video ID: ${data.video?.video_id || 'procesando...'}</p>
+        <p style="color:#888;font-size:0.8rem;">El video se esta generando. Usa el boton de abajo para verificar cuando este listo.</p>
+        <button class="btn btn-secondary" style="margin-top:10px;" onclick="checkVideo('${data.video?.video_id}')">Verificar Estado</button>
+        <div id="videoPlayer"></div>
+      </div>
+    `;
+  } catch(e) {
+    result.innerHTML = '<div class="info-card"><p style="color:#e94560;">Error al generar el video. Verifica tu API key de HeyGen.</p></div>';
+  }
+}
+
+async function checkVideo(videoId) {
+  if (!videoId || videoId === 'undefined') return;
+  try {
+    const res = await fetch(API + '/api/avatar/estado/' + videoId);
+    const data = await res.json();
+    const player = document.getElementById('videoPlayer');
+    if (data.status === 'completed' && data.video_url) {
+      player.innerHTML = `<video src="${data.video_url}" controls style="width:100%;border-radius:10px;margin-top:12px;"></video>`;
+    } else {
+      player.innerHTML = `<p style="color:#f0a500;font-size:0.8rem;margin-top:8px;">Estado: ${data.status || 'procesando'}. Intenta de nuevo en unos segundos.</p>`;
+    }
+  } catch(e) {
+    document.getElementById('videoPlayer').innerHTML = '<p style="color:#e94560;font-size:0.8rem;">Error al verificar estado.</p>';
+  }
+}
+
+// --- Init ---
+async function init() {
+  checkHealth();
+  loadRecordatorios();
+
+  // Load greeting
+  try {
+    const res = await fetch(API + '/api/conversacion/saludo');
+    const data = await res.json();
+    if (data.saludo) addChatMessage(data.saludo, 'alma');
+  } catch(e) {
+    addChatMessage('Hola Reyna, estoy encantada de la vida. ¿Como estas hoy?', 'alma');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
