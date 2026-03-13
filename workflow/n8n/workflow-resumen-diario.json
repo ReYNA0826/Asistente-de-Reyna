@@ -1,0 +1,307 @@
+{
+  "name": "Alma - Resumen Diario Automático",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "node-cron",
+      "name": "Lunes a Viernes 7:00 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.ALMA_API_URL}}/api/correos/resumen",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "node-correos-resumen",
+      "name": "Resumen de Correos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 160]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.ALMA_API_URL}}/api/recordatorios/resumen/reyna",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "node-recordatorios-resumen",
+      "name": "Resumen de Recordatorios",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 340]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{$env.ALMA_API_URL}}/api/monday/resumen",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "node-monday-resumen",
+      "name": "Resumen de Monday.com",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 520]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {},
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "node-merge",
+      "name": "Combinar datos",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.ALMA_API_URL}}/api/conversacion/resumen-diario",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "reyna-n8n"
+            },
+            {
+              "name": "correos",
+              "value": "={{ $('Resumen de Correos').item.json }}"
+            },
+            {
+              "name": "recordatorios",
+              "value": "={{ $('Resumen de Recordatorios').item.json }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        }
+      },
+      "id": "node-alma-resumen",
+      "name": "Alma genera resumen diario",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "resumen_alma",
+              "value": "={{ $json.resumen }}"
+            },
+            {
+              "name": "fecha",
+              "value": "={{ $now.format('yyyy-MM-dd') }}"
+            },
+            {
+              "name": "dia_semana",
+              "value": "={{ $now.format('EEEE') }}"
+            },
+            {
+              "name": "resumen_monday",
+              "value": "={{ JSON.stringify($('Resumen de Monday.com').item.json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-preparar",
+      "name": "Preparar contenido",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1180, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$env.REYNA_EMAIL}}",
+        "subject": "=☀️ Buenos días Reyna - Resumen del {{ $json.dia_semana }} {{ $json.fecha }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #6B4C9A;\">Buenos días, Reyna ☀️</h2>\n<p>Aquí tienes tu resumen del día preparado por Alma:</p>\n<hr>\n<div style=\"background: #f8f6fc; padding: 15px; border-radius: 8px; margin: 10px 0;\">\n<h3>📋 Resumen del día</h3>\n<p>{{ $json.resumen_alma }}</p>\n</div>\n<div style=\"background: #f0f7ff; padding: 15px; border-radius: 8px; margin: 10px 0;\">\n<h3>📊 Monday.com</h3>\n<p>{{ $json.resumen_monday }}</p>\n</div>\n<hr>\n<p style=\"color: #888; font-size: 12px;\">Generado automáticamente por Alma | {{ $json.fecha }}</p>\n</div>",
+        "options": {}
+      },
+      "id": "node-email-resumen",
+      "name": "Enviar resumen por email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1400, 200],
+      "credentials": {
+        "smtp": {
+          "id": "CONFIGURAR_CREDENCIAL",
+          "name": "SMTP - Reyna"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{$env.GOOGLE_SHEET_RESUMENES_ID}}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Resúmenes Diarios"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $json.fecha }}",
+            "Día": "={{ $json.dia_semana }}",
+            "Resumen Alma": "={{ $json.resumen_alma }}",
+            "Monday.com": "={{ $json.resumen_monday }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "node-sheets-log",
+      "name": "Log en Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1400, 420],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CONFIGURAR_CREDENCIAL",
+          "name": "Google Sheets - Reyna"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Lunes a Viernes 7:00 AM": {
+      "main": [
+        [
+          {
+            "node": "Resumen de Correos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Resumen de Recordatorios",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Resumen de Monday.com",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumen de Correos": {
+      "main": [
+        [
+          {
+            "node": "Combinar datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumen de Recordatorios": {
+      "main": [
+        [
+          {
+            "node": "Combinar datos",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Resumen de Monday.com": {
+      "main": [
+        [
+          {
+            "node": "Combinar datos",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Combinar datos": {
+      "main": [
+        [
+          {
+            "node": "Alma genera resumen diario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alma genera resumen diario": {
+      "main": [
+        [
+          {
+            "node": "Preparar contenido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar contenido": {
+      "main": [
+        [
+          {
+            "node": "Enviar resumen por email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log en Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Alma",
+      "id": "tag-alma"
+    },
+    {
+      "name": "Resumen Diario",
+      "id": "tag-resumen"
+    }
+  ],
+  "meta": {
+    "instanceId": "asistente-de-reyna",
+    "templateCredsSetupCompleted": false
+  }
+}
