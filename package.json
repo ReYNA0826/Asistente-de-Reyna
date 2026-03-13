@@ -1,0 +1,32 @@
+{
+  "name": "mi-secretaria-digital-alma",
+  "version": "1.0.0",
+  "description": "Alma - Tu asistente personal inteligente. Mi Secretaria Digital.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node --test src/**/*.test.js"
+  },
+  "keywords": ["assistant", "voice", "elevenlabs", "gmail", "alma"],
+  "author": "Reyna Vazquez",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "googleapis": "^144.0.0",
+    "elevenlabs": "^1.0.0",
+    "openai": "^4.73.0",
+    "helmet": "^8.0.0",
+    "express-rate-limit": "^7.4.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

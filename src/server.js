@@ -1,0 +1,68 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+const conversacionRoutes = require('./routes/conversacion');
+const vozRoutes = require('./routes/voz');
+const correosRoutes = require('./routes/correos');
+const recordatoriosRoutes = require('./routes/recordatorios');
+const authRoutes = require('./routes/auth');
+const saludRoutes = require('./routes/salud');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Seguridad
+app.use(helmet());
+app.use(cors());
+
+// Límite de peticiones
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100,
+  message: { error: 'Demasiadas peticiones. Intenta de nuevo más tarde.' }
+});
+app.use('/api/', limiter);
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+
+// Rutas
+app.use('/api/conversacion', conversacionRoutes);
+app.use('/api/voz', vozRoutes);
+app.use('/api/correos', correosRoutes);
+app.use('/api/recordatorios', recordatoriosRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/salud', saludRoutes);
+
+// Ruta raíz
+app.get('/', (req, res) => {
+  res.json({
+    nombre: 'Mi Secretaria Digital',
+    asistente: 'Alma',
+    version: '1.0.0',
+    estado: 'activo',
+    mensaje: 'Hola, soy Alma. Estoy encantada de la vida. ¿Cómo estás hoy?'
+  });
+});
+
+// Manejo de errores global
+app.use((err, req, res, _next) => {
+  console.error('[Alma Error]', err.message);
+  res.status(err.status || 500).json({
+    error: 'Algo salió mal. Alma está trabajando en ello.',
+    detalle: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`✨ Alma está lista en http://localhost:${PORT}`);
+  console.log(`📧 Correos: /api/correos`);
+  console.log(`🎤 Voz: /api/voz`);
+  console.log(`💬 Conversación: /api/conversacion`);
+  console.log(`⏰ Recordatorios: /api/recordatorios`);
+});
+
+module.exports = app;
