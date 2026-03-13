@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS recordatorios (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, user_id TEXT NOT NULL, titulo TEXT NOT NULL, descripcion TEXT DEFAULT '', fecha DATE NOT NULL DEFAULT CURRENT_DATE, hora TIME DEFAULT NULL, prioridad TEXT DEFAULT 'media' CHECK (prioridad IN ('alta', 'media', 'baja')), completado BOOLEAN DEFAULT FALSE, completado_en TIMESTAMPTZ DEFAULT NULL, creado_en TIMESTAMPTZ DEFAULT NOW());
+CREATE INDEX IF NOT EXISTS idx_recordatorios_user_fecha ON recordatorios(user_id, fecha);
+CREATE TABLE IF NOT EXISTS conversaciones (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, user_id TEXT NOT NULL, rol TEXT NOT NULL CHECK (rol IN ('user', 'assistant')), mensaje TEXT NOT NULL, creado_en TIMESTAMPTZ DEFAULT NOW());
+CREATE INDEX IF NOT EXISTS idx_conversaciones_user ON conversaciones(user_id, creado_en DESC);
+CREATE TABLE IF NOT EXISTS contactos (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, user_id TEXT NOT NULL, nombre TEXT NOT NULL, email TEXT, telefono TEXT, monday_item_id TEXT, notas TEXT DEFAULT '', creado_en TIMESTAMPTZ DEFAULT NOW(), actualizado_en TIMESTAMPTZ DEFAULT NOW());
+CREATE INDEX IF NOT EXISTS idx_contactos_user ON contactos(user_id);
+CREATE TABLE IF NOT EXISTS resumenes (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, user_id TEXT NOT NULL, fecha DATE NOT NULL DEFAULT CURRENT_DATE, contenido TEXT NOT NULL, creado_en TIMESTAMPTZ DEFAULT NOW());
+CREATE INDEX IF NOT EXISTS idx_resumenes_user_fecha ON resumenes(user_id, fecha DESC);
+ALTER TABLE recordatorios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE conversaciones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contactos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE resumenes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all for recordatorios" ON recordatorios FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for conversaciones" ON conversaciones FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for contactos" ON contactos FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for resumenes" ON resumenes FOR ALL USING (true) WITH CHECK (true);
