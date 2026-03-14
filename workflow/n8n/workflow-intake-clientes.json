@@ -1,0 +1,342 @@
+{
+  "name": "Alma - Intake de Clientes",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "intake-reyna",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-webhook",
+      "name": "Webhook - Formulario Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "intake-reyna-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-nombre",
+              "leftValue": "={{ $json.body.nombre }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            },
+            {
+              "id": "check-tipo-caso",
+              "leftValue": "={{ $json.body.tipo_caso }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "node-validar",
+      "name": "¿Datos válidos?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.ALMA_API_URL}}/api/conversacion/mensaje",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "intake-n8n"
+            },
+            {
+              "name": "mensaje",
+              "value": "=Evalúa este nuevo caso de intake:\n\nNombre: {{ $json.body.nombre }}\nTeléfono: {{ $json.body.telefono }}\nEmail: {{ $json.body.email }}\nTipo de caso: {{ $json.body.tipo_caso }}\nDescripción: {{ $json.body.descripcion }}\nUrgencia: {{ $json.body.urgencia || 'Normal' }}\nReferido por: {{ $json.body.referido_por || 'No especificado' }}\n\nGenera: 1) Un resumen profesional del caso. 2) Prioridad sugerida (alta/media/baja). 3) Próximos pasos recomendados."
+            },
+            {
+              "name": "contexto",
+              "value": "={\"tipo\": \"intake_cliente\", \"tipo_caso\": \"{{ $json.body.tipo_caso }}\"}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 90000
+        }
+      },
+      "id": "node-alma-evalua",
+      "name": "Alma evalúa caso",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 200]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "nombre_cliente",
+              "value": "={{ $('Webhook - Formulario Intake').item.json.body.nombre }}"
+            },
+            {
+              "name": "telefono",
+              "value": "={{ $('Webhook - Formulario Intake').item.json.body.telefono }}"
+            },
+            {
+              "name": "email_cliente",
+              "value": "={{ $('Webhook - Formulario Intake').item.json.body.email }}"
+            },
+            {
+              "name": "tipo_caso",
+              "value": "={{ $('Webhook - Formulario Intake').item.json.body.tipo_caso }}"
+            },
+            {
+              "name": "descripcion",
+              "value": "={{ $('Webhook - Formulario Intake').item.json.body.descripcion }}"
+            },
+            {
+              "name": "urgencia",
+              "value": "={{ $('Webhook - Formulario Intake').item.json.body.urgencia || 'Normal' }}"
+            },
+            {
+              "name": "evaluacion_alma",
+              "value": "={{ $json.respuesta }}"
+            },
+            {
+              "name": "fecha_intake",
+              "value": "={{ $now.format('yyyy-MM-dd HH:mm') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-preparar-datos",
+      "name": "Preparar datos del caso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [940, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.ALMA_API_URL}}/api/monday/tableros/{{$env.MONDAY_INTAKE_BOARD_ID}}/items",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "nombre",
+              "value": "={{ $json.nombre_cliente }} - {{ $json.tipo_caso }}"
+            },
+            {
+              "name": "columnValues",
+              "value": "={\"telefono\": \"{{ $json.telefono }}\", \"email\": {\"email\": \"{{ $json.email_cliente }}\", \"text\": \"{{ $json.email_cliente }}\"}, \"tipo_caso\": \"{{ $json.tipo_caso }}\", \"urgencia\": \"{{ $json.urgencia }}\", \"fecha_intake\": \"{{ $json.fecha_intake }}\", \"evaluacion\": \"{{ $json.evaluacion_alma }}\"}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "node-monday-crear",
+      "name": "Crear en Monday.com",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1180, 100]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{$env.GOOGLE_SHEET_INTAKE_ID}}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Intake Clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $json.fecha_intake }}",
+            "Nombre": "={{ $json.nombre_cliente }}",
+            "Teléfono": "={{ $json.telefono }}",
+            "Email": "={{ $json.email_cliente }}",
+            "Tipo de Caso": "={{ $json.tipo_caso }}",
+            "Descripción": "={{ $json.descripcion }}",
+            "Urgencia": "={{ $json.urgencia }}",
+            "Evaluación Alma": "={{ $json.evaluacion_alma }}",
+            "Estado": "Nuevo"
+          }
+        },
+        "options": {}
+      },
+      "id": "node-sheets-intake",
+      "name": "Guardar en Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1180, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CONFIGURAR_CREDENCIAL",
+          "name": "Google Sheets - Reyna"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$env.REYNA_EMAIL}}",
+        "subject": "=🆕 Nuevo Intake: {{ $json.nombre_cliente }} - {{ $json.tipo_caso }}",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n<h2 style=\"color: #6B4C9A;\">Nuevo Cliente - Intake</h2>\n<table style=\"width: 100%; border-collapse: collapse;\">\n<tr><td style=\"padding: 8px; border-bottom: 1px solid #eee;\"><strong>Nombre:</strong></td><td>{{ $json.nombre_cliente }}</td></tr>\n<tr><td style=\"padding: 8px; border-bottom: 1px solid #eee;\"><strong>Teléfono:</strong></td><td>{{ $json.telefono }}</td></tr>\n<tr><td style=\"padding: 8px; border-bottom: 1px solid #eee;\"><strong>Email:</strong></td><td>{{ $json.email_cliente }}</td></tr>\n<tr><td style=\"padding: 8px; border-bottom: 1px solid #eee;\"><strong>Tipo de caso:</strong></td><td>{{ $json.tipo_caso }}</td></tr>\n<tr><td style=\"padding: 8px; border-bottom: 1px solid #eee;\"><strong>Urgencia:</strong></td><td>{{ $json.urgencia }}</td></tr>\n</table>\n<hr>\n<div style=\"background: #f8f6fc; padding: 15px; border-radius: 8px; margin: 10px 0;\">\n<h3>🤖 Evaluación de Alma:</h3>\n<p>{{ $json.evaluacion_alma }}</p>\n</div>\n<div style=\"background: #fff3cd; padding: 15px; border-radius: 8px; margin: 10px 0;\">\n<h3>📝 Descripción del cliente:</h3>\n<p>{{ $json.descripcion }}</p>\n</div>\n<hr>\n<p style=\"color: #888; font-size: 12px;\">Procesado automáticamente por Alma | {{ $json.fecha_intake }}</p>\n</div>",
+        "options": {}
+      },
+      "id": "node-email-notificacion",
+      "name": "Notificar a Reyna",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1180, 500],
+      "credentials": {
+        "smtp": {
+          "id": "CONFIGURAR_CREDENCIAL",
+          "name": "SMTP - Reyna"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"estado\": \"OK\", \"mensaje\": \"Intake recibido correctamente. Alma está procesando el caso.\", \"nombre\": \"{{ $('Preparar datos del caso').item.json.nombre_cliente }}\"}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "node-response-ok",
+      "name": "Respuesta exitosa",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1460, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"estado\": \"ERROR\", \"mensaje\": \"Datos incompletos. Se requiere: nombre y tipo_caso.\"}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "node-response-error",
+      "name": "Respuesta error - datos faltantes",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [700, 420]
+    }
+  ],
+  "connections": {
+    "Webhook - Formulario Intake": {
+      "main": [
+        [
+          {
+            "node": "¿Datos válidos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Datos válidos?": {
+      "main": [
+        [
+          {
+            "node": "Alma evalúa caso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta error - datos faltantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alma evalúa caso": {
+      "main": [
+        [
+          {
+            "node": "Preparar datos del caso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar datos del caso": {
+      "main": [
+        [
+          {
+            "node": "Crear en Monday.com",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Guardar en Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notificar a Reyna",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear en Monday.com": {
+      "main": [
+        [
+          {
+            "node": "Respuesta exitosa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Alma",
+      "id": "tag-alma"
+    },
+    {
+      "name": "Intake",
+      "id": "tag-intake"
+    }
+  ],
+  "meta": {
+    "instanceId": "asistente-de-reyna",
+    "templateCredsSetupCompleted": false
+  }
+}
