@@ -14,6 +14,7 @@
       --blue-light: #3B82F6;
       --blue-dark: #1D4ED8;
       --blue-bg: #EFF6FF;
+      --blue-muted: #DBEAFE;
       --orange: #F59E0B;
       --orange-bg: #FEF3C7;
       --red: #EF4444;
@@ -36,7 +37,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-      background: var(--gray-50);
+      background: var(--gray-100);
       color: var(--gray-800);
       min-height: 100vh;
       max-width: 430px;
@@ -48,7 +49,7 @@
     /* ===== HEADER ===== */
     .header {
       background: white;
-      padding: 12px 20px;
+      padding: 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -57,73 +58,134 @@
       top: 0;
       z-index: 100;
     }
-    .header-title {
-      font-size: 0.8rem;
-      color: var(--gray-400);
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-    .header-icons { display: flex; gap: 12px; }
-    .header-icons button {
-      background: none;
-      border: none;
-      color: var(--gray-500);
-      font-size: 1.2rem;
-      cursor: pointer;
-      padding: 4px;
-    }
-
-    /* ===== HERO / GREETING ===== */
-    .hero {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2563EB 100%);
-      padding: 24px 20px 20px;
-      color: white;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero::after {
-      content: '';
-      position: absolute;
-      top: 0; right: 0; bottom: 0;
-      width: 45%;
-      background: linear-gradient(to left, rgba(255,255,255,0.08), transparent);
-    }
-    .hero-greeting {
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .hero-subtitle {
-      font-size: 0.9rem;
-      opacity: 0.85;
-      font-weight: 400;
-    }
-    .hero-alma {
+    .header-left {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-top: 16px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 16px;
-      padding: 12px 16px;
-      backdrop-filter: blur(10px);
     }
-    .alma-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #dbeafe, #93c5fd);
+    .header-hamburger {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--gray-600);
+      cursor: pointer;
+      padding: 2px;
+      line-height: 1;
+    }
+    .header-title {
+      font-size: 1rem;
+      color: var(--gray-800);
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .header-icons { display: flex; gap: 10px; }
+    .header-icons button {
+      background: var(--gray-100);
+      border: none;
+      color: var(--gray-600);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 10px;
+      width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
-      flex-shrink: 0;
-      border: 2px solid rgba(255,255,255,0.3);
     }
-    .alma-bubble {
-      font-size: 0.85rem;
-      line-height: 1.4;
-      opacity: 0.95;
+
+    /* ===== HERO WITH ALMA PHOTO ===== */
+    .hero {
+      position: relative;
+      width: 100%;
+      min-height: 320px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e8edf5 0%, #d4dce8 50%, #c5cdd8 100%);
+    }
+    .hero-bg {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+    }
+    .hero-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.85) 0%,
+        rgba(255,255,255,0.4) 30%,
+        rgba(255,255,255,0.1) 60%,
+        rgba(0,0,0,0.15) 100%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 24px 20px 16px;
+    }
+    .hero-greeting {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--gray-800);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .hero-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hero-stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .hero-stat:active { transform: scale(0.97); }
+    .hero-stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .hero-stat-text {
+      flex: 1;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    .hero-stat-arrow {
+      color: var(--gray-400);
+      font-size: 1rem;
+    }
+
+    /* Alma speech bubble */
+    .hero-bubble {
+      position: relative;
+      z-index: 2;
+      margin: 0 16px 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 18px;
+      padding: 14px 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .hero-bubble-text {
+      font-size: 0.9rem;
+      color: var(--gray-700);
+      line-height: 1.5;
     }
 
     /* ===== SCREENS ===== */
@@ -133,6 +195,7 @@
     /* ===== DASHBOARD ===== */
     .dashboard { padding: 16px 16px 100px; }
 
+    /* Summary cards */
     .summary-cards {
       display: flex;
       flex-direction: column;
@@ -175,7 +238,7 @@
     }
     .summary-card .card-arrow {
       color: var(--gray-300);
-      font-size: 1.1rem;
+      font-size: 1.2rem;
     }
     .summary-card .badge {
       position: absolute;
@@ -185,9 +248,10 @@
       color: white;
       font-size: 0.7rem;
       font-weight: 700;
-      width: 20px;
+      min-width: 20px;
       height: 20px;
-      border-radius: 50%;
+      border-radius: 10px;
+      padding: 0 5px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -196,7 +260,7 @@
     .icon-correos { background: var(--blue-bg); color: var(--blue); }
     .icon-docs { background: var(--orange-bg); color: var(--orange); }
     .icon-recordatorios { background: var(--green-bg); color: var(--green); }
-    .icon-archivables { background: var(--gray-100); color: var(--gray-500); }
+    .icon-archivables { background: #F3F4F6; color: var(--gray-500); }
 
     /* Section */
     .section-header {
@@ -206,7 +270,7 @@
       margin-bottom: 10px;
     }
     .section-title {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--gray-700);
     }
@@ -229,34 +293,88 @@
       display: flex;
       align-items: flex-start;
       gap: 12px;
+      cursor: pointer;
+      transition: transform 0.15s;
     }
+    .important-item:active { transform: scale(0.98); }
     .important-item .item-icon {
-      width: 36px; height: 36px;
+      width: 40px; height: 40px;
       border-radius: 50%;
       background: var(--blue-bg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
+      font-size: 1rem;
       flex-shrink: 0;
       margin-top: 2px;
     }
     .important-item .item-content { flex: 1; }
     .important-item .item-title { font-size: 0.9rem; font-weight: 600; color: var(--gray-700); }
-    .important-item .item-desc { font-size: 0.8rem; color: var(--gray-400); margin-top: 2px; }
+    .important-item .item-desc { font-size: 0.8rem; color: var(--gray-400); margin-top: 2px; line-height: 1.4; }
     .important-item .item-tag {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       margin-top: 6px;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 6px;
+    }
+    .important-item .item-arrow {
+      color: var(--gray-300);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 6px;
     }
     .tag-urgente { background: var(--red-bg); color: var(--red); }
     .tag-revisar { background: var(--orange-bg); color: var(--orange); }
     .tag-info { background: var(--blue-bg); color: var(--blue); }
 
-    /* Quick actions */
+    /* Archivable section */
+    .archive-section { margin-bottom: 20px; }
+    .archive-card {
+      background: white;
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.15s;
+      margin-bottom: 8px;
+    }
+    .archive-card:active { transform: scale(0.98); }
+    .archive-card .archive-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .archive-card .archive-text {
+      flex: 1;
+    }
+    .archive-card .archive-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    .archive-card .archive-subtitle {
+      font-size: 0.78rem;
+      color: var(--gray-400);
+      margin-top: 2px;
+    }
+    .archive-card .archive-arrow {
+      color: var(--gray-300);
+      font-size: 1.1rem;
+    }
+
+    /* Quick actions row */
     .quick-actions {
       display: flex;
       gap: 10px;
@@ -266,7 +384,7 @@
       flex: 1;
       background: white;
       border-radius: 14px;
-      padding: 14px 10px;
+      padding: 14px 8px;
       text-align: center;
       box-shadow: var(--shadow);
       cursor: pointer;
@@ -274,13 +392,27 @@
       transition: transform 0.15s;
     }
     .quick-action:active { transform: scale(0.95); }
-    .quick-action .qa-icon { font-size: 1.4rem; margin-bottom: 6px; }
-    .quick-action .qa-label { font-size: 0.75rem; color: var(--gray-600); font-weight: 500; }
+    .quick-action .qa-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin: 0 auto 8px;
+    }
+    .quick-action .qa-label {
+      font-size: 0.72rem;
+      color: var(--gray-600);
+      font-weight: 600;
+      line-height: 1.3;
+    }
 
-    /* ===== HABLAR CON ALMA BUTTON ===== */
+    /* ===== VOICE BUTTONS ===== */
     .voice-btn-container {
       position: fixed;
-      bottom: 80px;
+      bottom: 76px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 90;
@@ -295,7 +427,7 @@
       border: none;
       border-radius: 16px;
       font-size: 1.05rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -303,6 +435,7 @@
       gap: 10px;
       box-shadow: var(--shadow-lg), 0 0 0 0 rgba(37,99,235,0.3);
       transition: all 0.2s;
+      letter-spacing: -0.2px;
     }
     .voice-btn:active { transform: scale(0.97); background: var(--blue-dark); }
     .voice-btn.recording {
@@ -314,6 +447,32 @@
       50% { box-shadow: var(--shadow-lg), 0 0 0 14px rgba(239,68,68,0); }
     }
     .voice-btn .mic-icon { font-size: 1.2rem; }
+
+    /* Secondary voice btn (text entry) */
+    .ask-btn-container {
+      padding: 0 16px 8px;
+    }
+    .ask-btn {
+      width: 100%;
+      padding: 14px;
+      background: white;
+      color: var(--gray-600);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .ask-btn:active { background: var(--gray-50); border-color: var(--blue); }
+    .ask-btn .ask-icon {
+      font-size: 1rem;
+      color: var(--orange);
+    }
 
     /* ===== TAB BAR ===== */
     .tab-bar {
@@ -327,7 +486,7 @@
       border-top: 1px solid var(--gray-200);
       display: flex;
       justify-content: space-around;
-      padding: 8px 0 env(safe-area-inset-bottom, 8px);
+      padding: 6px 0 env(safe-area-inset-bottom, 8px);
       z-index: 100;
     }
     .tab-item {
@@ -344,7 +503,7 @@
     }
     .tab-item.active { color: var(--blue); }
     .tab-item .tab-icon { font-size: 1.3rem; }
-    .tab-item .tab-label { font-size: 0.65rem; font-weight: 500; }
+    .tab-item .tab-label { font-size: 0.65rem; font-weight: 600; }
 
     /* ===== CHAT SCREEN ===== */
     .chat-screen { padding: 0 0 160px; display: flex; flex-direction: column; min-height: calc(100vh - 200px); }
@@ -406,7 +565,7 @@
 
     .chat-input-area {
       position: fixed;
-      bottom: 70px;
+      bottom: 66px;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
@@ -557,16 +716,54 @@
     @keyframes dotBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
     .empty { text-align: center; padding: 32px 16px; color: var(--gray-400); font-size: 0.9rem; }
-
-    /* Hide elements */
     .hidden { display: none !important; }
+
+    /* Alma avatar image placeholder */
+    .alma-photo {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+    .alma-photo-placeholder {
+      width: 100%;
+      height: 320px;
+      background: linear-gradient(135deg, #e8edf5 0%, #d4dce8 50%, #c5cdd8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .alma-photo-placeholder .alma-silhouette {
+      width: 160px;
+      height: 200px;
+      background: linear-gradient(180deg, #b8c5d4 0%, #a0b0c4 100%);
+      border-radius: 50% 50% 40% 40%;
+      position: relative;
+      margin-top: 20px;
+    }
+    .alma-photo-placeholder .alma-silhouette::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(180deg, #c5d0dd 0%, #b0bdc8 100%);
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
   <div class="header">
-    <span class="header-title">Mi Secretaria Digital</span>
+    <div class="header-left">
+      <button class="header-hamburger" onclick="toggleMenu()">&#9776;</button>
+      <span class="header-title">Mi Secretaria Digital</span>
+    </div>
     <div class="header-icons">
       <button onclick="showScreen('correos')" title="Correos">&#9993;</button>
       <button onclick="checkHealth()" title="Estado">&#9881;</button>
@@ -576,63 +773,53 @@
   <!-- ===== HOME SCREEN ===== -->
   <div class="screen active" id="screen-home">
 
-    <!-- Hero greeting -->
+    <!-- Hero with Alma photo -->
     <div class="hero">
-      <div class="hero-greeting" id="greeting">Buenos dias, Reyna</div>
-      <div class="hero-subtitle" id="greetingSub">Aqui esta tu resumen de hoy</div>
-      <div class="hero-alma">
-        <div class="alma-avatar">&#128105;&#8205;&#128188;</div>
-        <div class="alma-bubble" id="almaBubble">Hola, Reyna. Estoy encantada de la vida. ¿Como estas hoy?</div>
+      <div class="hero-bg" id="heroBg"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-greeting" id="greeting">Buenos dias, Reyna</div>
+        <div class="hero-stats">
+          <div class="hero-stat" onclick="showScreen('correos')">
+            <div class="hero-stat-icon icon-correos">&#9993;</div>
+            <span class="hero-stat-text" id="correoCount">Tienes 0 correos importantes</span>
+            <span class="hero-stat-arrow">&#8250;</span>
+          </div>
+          <div class="hero-stat" onclick="showScreen('recordatorios')">
+            <div class="hero-stat-icon icon-recordatorios">&#9200;</div>
+            <span class="hero-stat-text" id="recCount">0 recordatorios para hoy</span>
+            <span class="hero-stat-arrow">&#8250;</span>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Alma bubble -->
+    <div class="hero-bubble">
+      <div class="hero-bubble-text" id="almaBubble">Hola, Reyna. Organice tus pendientes de hoy. ¿Quieres empezar con los correos importantes?</div>
+    </div>
+
+    <!-- Voice button -->
+    <div style="padding: 0 16px 12px;">
+      <button class="voice-btn" id="homeVoiceBtn" onclick="startVoiceFromHome()" style="border-radius:14px;">
+        <span class="mic-icon">&#127908;</span>
+        Preguntar a Alma
+      </button>
+    </div>
+
     <div class="dashboard">
-
-      <!-- Summary cards -->
-      <div class="summary-cards" id="summaryCards">
-        <div class="summary-card" onclick="showScreen('correos')">
-          <div class="icon-circle icon-correos">&#9993;</div>
-          <div class="card-content">
-            <div class="card-title" id="correoCount">Correos importantes</div>
-            <div class="card-subtitle">Requieren respuesta</div>
-          </div>
-          <span class="card-arrow">&#8250;</span>
-        </div>
-
-        <div class="summary-card" onclick="showScreen('recordatorios')">
-          <div class="icon-circle icon-recordatorios">&#9200;</div>
-          <div class="card-content">
-            <div class="card-title" id="recCount">Recordatorios hoy</div>
-            <div class="card-subtitle">Pendientes del dia</div>
-          </div>
-          <span class="card-arrow">&#8250;</span>
-        </div>
-
-        <div class="summary-card" onclick="showScreen('correos')">
-          <div class="icon-circle icon-archivables">&#128230;</div>
-          <div class="card-content">
-            <div class="card-title">Correos archivables</div>
-            <div class="card-subtitle">Promociones y newsletters</div>
-          </div>
-          <span class="card-arrow">&#8250;</span>
-        </div>
-      </div>
-
-      <!-- Quick actions -->
-      <div class="section-header">
-        <span class="section-title">Acciones rapidas</span>
-      </div>
+      <!-- Quick actions row -->
       <div class="quick-actions">
         <button class="quick-action" onclick="showScreen('correos')">
-          <div class="qa-icon">&#128231;</div>
+          <div class="qa-icon icon-correos">&#128231;</div>
           <div class="qa-label">Correos importantes</div>
         </button>
         <button class="quick-action" onclick="showScreen('recordatorios')">
-          <div class="qa-icon">&#128197;</div>
+          <div class="qa-icon icon-recordatorios">&#128197;</div>
           <div class="qa-label">Recordatorios</div>
         </button>
-        <button class="quick-action" onclick="showScreen('correos')">
-          <div class="qa-icon">&#128230;</div>
+        <button class="quick-action" onclick="archivarPromocionales()">
+          <div class="qa-icon" style="background:var(--orange-bg);color:var(--orange);">&#128230;</div>
           <div class="qa-label">Correos archivables</div>
         </button>
       </div>
@@ -643,31 +830,69 @@
         <button class="section-action" onclick="showScreen('correos')">Ver todo</button>
       </div>
       <div class="important-list" id="importantPreview">
-        <div class="important-item">
+        <div class="important-item" onclick="showScreen('correos')">
           <div class="item-icon">&#128100;</div>
           <div class="item-content">
             <div class="item-title">Cliente - Consulta de inmigracion</div>
             <div class="item-desc">Necesito informacion sobre mi caso.</div>
-            <span class="item-tag tag-urgente">Requiere respuesta</span>
+            <span class="item-tag tag-urgente">&#128308; Requiere respuesta</span>
           </div>
+          <span class="item-arrow">&#8250;</span>
         </div>
-        <div class="important-item">
-          <div class="item-icon">&#128196;</div>
+        <div class="important-item" onclick="showScreen('correos')">
+          <div class="item-icon" style="background:var(--orange-bg);color:var(--orange);">&#128196;</div>
           <div class="item-content">
             <div class="item-title">Documentos enviados</div>
             <div class="item-desc">Hola Reyna, adjunto los documentos.</div>
-            <span class="item-tag tag-revisar">Documentos por revisar</span>
+            <span class="item-tag tag-revisar">&#128308; Documentos por revisar</span>
           </div>
+          <span class="item-arrow">&#8250;</span>
+        </div>
+      </div>
+
+      <!-- Correos que puedes archivar -->
+      <div class="section-header">
+        <span class="section-title">Correos que puedes archivar</span>
+      </div>
+      <div class="archive-section">
+        <div class="archive-card" onclick="archivarPromocionales()">
+          <div class="archive-icon" style="background:var(--green-bg);color:var(--green);">&#128230;</div>
+          <div class="archive-text">
+            <div class="archive-title">Correos archivar</div>
+            <div class="archive-subtitle" id="archiveCount">Promociones y newsletters</div>
+          </div>
+          <span class="archive-arrow">&#8250;</span>
+        </div>
+      </div>
+
+      <!-- Recordatorios quick view -->
+      <div class="summary-cards">
+        <div class="summary-card" onclick="showScreen('recordatorios')">
+          <div class="icon-circle icon-recordatorios">&#128197;</div>
+          <div class="card-content">
+            <div class="card-title" id="recCountCard">Recordatorios para hoy</div>
+            <div class="card-subtitle">Toca para ver todos</div>
+          </div>
+          <span class="card-arrow">&#8250;</span>
+        </div>
+        <div class="summary-card" onclick="archivarPromocionales()">
+          <div class="icon-circle icon-archivables">&#128465;</div>
+          <div class="card-content">
+            <div class="card-title">Archivar correos promocionales</div>
+            <div class="card-subtitle">Limpia tu bandeja</div>
+          </div>
+          <span class="card-arrow">&#8250;</span>
         </div>
       </div>
 
     </div>
 
-    <!-- Voice button -->
+    <!-- Bottom voice button (fixed) -->
     <div class="voice-btn-container">
-      <button class="voice-btn" id="homeVoiceBtn" onclick="startVoiceFromHome()">
-        <span class="mic-icon">&#127908;</span>
-        Hablar con Alma
+      <button class="voice-btn" onclick="showScreen('chat')" style="background:white;color:var(--gray-600);border:1.5px solid var(--gray-200);box-shadow:var(--shadow-md);">
+        <span style="color:var(--orange);">&#127908;</span>
+        Preguntar a Alma
+        <span style="color:var(--gray-300);margin-left:auto;">&#8250;</span>
       </button>
     </div>
   </div>
@@ -765,12 +990,19 @@ function showScreen(name) {
   if (tab) tab.classList.add('active');
 
   // Show/hide voice button and chat input
-  document.querySelector('.voice-btn-container').classList.toggle('hidden', name !== 'home');
-  document.querySelector('.chat-input-area').classList.toggle('hidden', name !== 'chat');
+  const voiceContainer = document.querySelector('.voice-btn-container');
+  const chatInput = document.querySelector('.chat-input-area');
+  if (voiceContainer) voiceContainer.classList.toggle('hidden', name !== 'home');
+  if (chatInput) chatInput.classList.toggle('hidden', name !== 'chat');
 
   if (name === 'chat' && document.getElementById('chatMessages').children.length === 0) {
     addChatMsg('Hola Reyna, estoy encantada de la vida. ¿En que puedo ayudarte?', 'alma');
   }
+}
+
+// ===== MENU =====
+function toggleMenu() {
+  // Future: slide-in sidebar menu
 }
 
 // ===== GREETING =====
@@ -807,10 +1039,9 @@ function addChatMsg(text, type, audioB64) {
   if (type === 'alma') {
     let html = '<div class="msg-name">Alma</div>' + escapeHtml(text);
     if (audioB64) {
-      html += `<div class="msg-audio">
-        <button onclick="playAudio(this)" data-src="data:audio/mpeg;base64,${audioB64}">&#9654;</button>
-        <span>Escuchar</span>
-      </div>`;
+      html += '<div class="msg-audio">' +
+        '<button onclick="playAudio(this)" data-src="data:audio/mpeg;base64,' + audioB64 + '">&#9654;</button>' +
+        '<span>Escuchar</span></div>';
     }
     div.innerHTML = html;
   } else {
@@ -882,7 +1113,7 @@ let audioChunks = [];
 
 function startVoiceFromHome() {
   showScreen('chat');
-  setTimeout(() => toggleRecording(), 300);
+  setTimeout(function() { toggleRecording(); }, 300);
 }
 
 async function toggleRecording() {
@@ -893,8 +1124,10 @@ async function toggleRecording() {
     mediaRecorder.stop();
     btn.classList.remove('recording');
     btn.innerHTML = '&#127908;';
-    homeBtn.classList.remove('recording');
-    homeBtn.innerHTML = '<span class="mic-icon">&#127908;</span> Hablar con Alma';
+    if (homeBtn) {
+      homeBtn.classList.remove('recording');
+      homeBtn.innerHTML = '<span class="mic-icon">&#127908;</span> Preguntar a Alma';
+    }
     return;
   }
 
@@ -903,12 +1136,12 @@ async function toggleRecording() {
     mediaRecorder = new MediaRecorder(stream);
     audioChunks = [];
 
-    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-    mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
+    mediaRecorder.ondataavailable = function(e) { audioChunks.push(e.data); };
+    mediaRecorder.onstop = async function() {
+      stream.getTracks().forEach(function(t) { t.stop(); });
       const blob = new Blob(audioChunks, { type: 'audio/webm' });
       const reader = new FileReader();
-      reader.onloadend = async () => {
+      reader.onloadend = async function() {
         const b64 = reader.result.split(',')[1];
         showTyping();
         try {
@@ -932,8 +1165,10 @@ async function toggleRecording() {
     mediaRecorder.start();
     btn.classList.add('recording');
     btn.innerHTML = '&#9632;';
-    homeBtn.classList.add('recording');
-    homeBtn.innerHTML = '<span class="mic-icon">&#9632;</span> Escuchando... Toca para enviar';
+    if (homeBtn) {
+      homeBtn.classList.add('recording');
+      homeBtn.innerHTML = '<span class="mic-icon">&#9632;</span> Escuchando... Toca para enviar';
+    }
   } catch(e) {
     alert('No se pudo acceder al microfono.');
   }
@@ -956,21 +1191,71 @@ async function loadCorreos() {
     const data = await res.json();
     if (!data.correos || data.correos.length === 0) {
       list.innerHTML = '<div class="empty">No hay correos nuevos importantes</div>';
+      document.getElementById('correoCount').textContent = 'No hay correos importantes';
       return;
     }
-    document.getElementById('correoCount').textContent = data.correos.length + ' correos importantes';
-    list.innerHTML = data.correos.map(c => `
-      <div class="correo-card">
-        <div class="correo-from">${escapeHtml(c.de || c.from || 'Desconocido')}</div>
-        <div class="correo-subject">${escapeHtml(c.asunto || c.subject || 'Sin asunto')}</div>
-        <span class="correo-tag">Requiere respuesta</span>
-      </div>
-    `).join('');
+    const count = data.correos.length;
+    document.getElementById('correoCount').textContent = 'Tienes ' + count + ' correos importantes';
+
+    // Update important preview on home
+    updateImportantPreview(data.correos);
+
+    list.innerHTML = data.correos.map(function(c) {
+      return '<div class="correo-card">' +
+        '<div class="correo-from">' + escapeHtml(c.de || c.from || 'Desconocido') + '</div>' +
+        '<div class="correo-subject">' + escapeHtml(c.asunto || c.subject || 'Sin asunto') + '</div>' +
+        '<span class="correo-tag">Requiere respuesta</span>' +
+      '</div>';
+    }).join('');
   } catch(e) {
-    list.innerHTML = `<div class="gmail-connect-box">
-      <p>Conecta tu Gmail para ver tus correos</p>
-      <button class="btn btn-blue" onclick="connectGmail()">Conectar Gmail</button>
-    </div>`;
+    list.innerHTML = '<div class="gmail-connect-box">' +
+      '<p>Conecta tu Gmail para ver tus correos</p>' +
+      '<button class="btn btn-blue" onclick="connectGmail()">Conectar Gmail</button>' +
+    '</div>';
+  }
+}
+
+function updateImportantPreview(correos) {
+  const preview = document.getElementById('importantPreview');
+  if (!correos || correos.length === 0) {
+    preview.innerHTML = '<div class="empty">No hay correos importantes</div>';
+    return;
+  }
+  preview.innerHTML = correos.slice(0, 3).map(function(c) {
+    const from = escapeHtml(c.de || c.from || 'Desconocido');
+    const subject = escapeHtml(c.asunto || c.subject || 'Sin asunto');
+    const snippet = escapeHtml(c.fragmento || c.snippet || '');
+    return '<div class="important-item" onclick="showScreen(\'correos\')">' +
+      '<div class="item-icon">&#128100;</div>' +
+      '<div class="item-content">' +
+        '<div class="item-title">' + from + '</div>' +
+        '<div class="item-desc">' + (subject + (snippet ? ' - ' + snippet : '')) + '</div>' +
+        '<span class="item-tag tag-urgente">&#128308; Requiere respuesta</span>' +
+      '</div>' +
+      '<span class="item-arrow">&#8250;</span>' +
+    '</div>';
+  }).join('');
+}
+
+async function archivarPromocionales() {
+  if (!confirm('¿Archivar todos los correos promocionales?')) return;
+  try {
+    const res = await fetch(API + '/api/correos/archivables');
+    const data = await res.json();
+    if (data.correos && data.correos.length > 0) {
+      const ids = data.correos.map(function(c) { return c.id; });
+      await fetch(API + '/api/correos/archivar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: ids })
+      });
+      alert('Se archivaron ' + ids.length + ' correos promocionales.');
+      loadDashboardData();
+    } else {
+      alert('No hay correos para archivar.');
+    }
+  } catch(e) {
+    alert('Error al archivar correos.');
   }
 }
 
@@ -985,7 +1270,7 @@ async function addRecordatorio() {
     await fetch(API + '/api/recordatorios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: USER_ID, titulo, fecha, hora, prioridad })
+      body: JSON.stringify({ userId: USER_ID, titulo: titulo, fecha: fecha, hora: hora, prioridad: prioridad })
     });
     document.getElementById('recTitulo').value = '';
     loadRecordatorios();
@@ -998,20 +1283,22 @@ async function loadRecordatorios() {
     const res = await fetch(API + '/api/recordatorios/hoy/' + USER_ID);
     const data = await res.json();
     const recs = data.recordatorios || [];
-    document.getElementById('recCount').textContent = recs.length + ' recordatorios hoy';
+    const count = recs.filter(function(r) { return !r.completado; }).length;
+    document.getElementById('recCount').textContent = count + ' recordatorios para hoy';
+    document.getElementById('recCountCard').textContent = count + ' Recordatorios para hoy';
     if (recs.length === 0) {
       list.innerHTML = '<div class="empty">No hay recordatorios para hoy</div>';
       return;
     }
-    list.innerHTML = recs.map(r => `
-      <div class="rec-item ${r.completado ? 'done' : ''}" onclick="completeRec('${r.id}')">
-        <div class="rec-dot ${r.prioridad || 'media'}"></div>
-        <div style="flex:1">
-          <div class="rec-title">${escapeHtml(r.titulo)}</div>
-          ${r.hora ? `<div class="rec-time">${r.hora}</div>` : ''}
-        </div>
-      </div>
-    `).join('');
+    list.innerHTML = recs.map(function(r) {
+      return '<div class="rec-item ' + (r.completado ? 'done' : '') + '" onclick="completeRec(\'' + r.id + '\')">' +
+        '<div class="rec-dot ' + (r.prioridad || 'media') + '"></div>' +
+        '<div style="flex:1">' +
+          '<div class="rec-title">' + escapeHtml(r.titulo) + '</div>' +
+          (r.hora ? '<div class="rec-time">' + r.hora + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
   } catch(e) {
     list.innerHTML = '<div class="empty">Error al cargar recordatorios</div>';
   }
@@ -1024,9 +1311,48 @@ async function completeRec(id) {
   } catch(e) {}
 }
 
+// ===== LOAD ARCHIVABLE COUNT =====
+async function loadArchivableCount() {
+  try {
+    const res = await fetch(API + '/api/correos/resumen');
+    const data = await res.json();
+    if (data.resumen) {
+      const promo = data.resumen.promociones || 0;
+      if (promo > 0) {
+        document.getElementById('archiveCount').textContent = promo + ' correos promocionales';
+      }
+    }
+  } catch(e) {}
+}
+
+// ===== DASHBOARD DATA =====
+async function loadDashboardData() {
+  loadRecordatorios();
+  try { loadCorreos(); } catch(e) {}
+  try { loadArchivableCount(); } catch(e) {}
+}
+
+// ===== ALMA PHOTO =====
+function setupAlmaPhoto() {
+  const bg = document.getElementById('heroBg');
+  // Try JPG first (user uploaded), then SVG placeholder
+  const img = new Image();
+  img.onload = function() {
+    bg.style.backgroundImage = 'url(img/alma-avatar.jpg)';
+  };
+  img.onerror = function() {
+    // Fallback to SVG
+    bg.style.backgroundImage = 'url(img/alma-avatar.svg)';
+    bg.style.backgroundSize = 'cover';
+    bg.style.backgroundPosition = 'center';
+  };
+  img.src = 'img/alma-avatar.jpg';
+}
+
 // ===== INIT =====
 async function init() {
   updateGreeting();
+  setupAlmaPhoto();
 
   // Hide chat input initially
   document.querySelector('.chat-input-area').classList.add('hidden');
@@ -1038,7 +1364,7 @@ async function init() {
     if (data.saludo) document.getElementById('almaBubble').textContent = data.saludo;
   } catch(e) {}
 
-  loadRecordatorios();
+  loadDashboardData();
 }
 
 init();
