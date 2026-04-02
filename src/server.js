@@ -15,8 +15,11 @@ const saludRoutes = require('./routes/salud');
 const mondayRoutes = require('./routes/monday');
 const { inicializarTablas } = require('./config/supabase');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+18: const app = express();
+19: const PORT = process.env.PORT || 3000;
+20: app.set('trust proxy', 1);
+21: 
+22: // Seguridad
 
 // Seguridad
 app.use(helmet());
