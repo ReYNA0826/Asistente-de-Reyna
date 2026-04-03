@@ -1,0 +1,103 @@
+{
+  "name": "Asistente de Reyna - Flujo Básico",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "asistente-reyna-webhook",
+      "parameters": {
+        "path": "asistente-reyna",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ASISTENTE_API_URL }}/api/asistente-reyna",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.ASISTENTE_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "usuario",
+              "value": "={{ $json.body.usuario || 'Reyna' }}"
+            },
+            {
+              "name": "mensaje",
+              "value": "={{ $json.body.mensaje }}"
+            },
+            {
+              "name": "contexto",
+              "value": "={{ $json.body.contexto || 'operativo' }}"
+            },
+            {
+              "name": "modo",
+              "value": "={{ $json.body.modo || 'detallado' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "llamar-asistente",
+      "name": "Llamar Asistente API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "responder-webhook",
+      "name": "Responder Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [710, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Llamar Asistente API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Llamar Asistente API": {
+      "main": [
+        [
+          {
+            "node": "Responder Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

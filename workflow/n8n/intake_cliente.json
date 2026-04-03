@@ -1,0 +1,132 @@
+{
+  "name": "Asistente de Reyna - Intake de Cliente",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "intake-cliente",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      },
+      "id": "trigger-intake",
+      "name": "Formulario Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ASISTENTE_API_URL }}/api/asistente-reyna",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.ASISTENTE_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "usuario",
+              "value": "n8n-intake"
+            },
+            {
+              "name": "mensaje",
+              "value": "=Nuevo cliente para intake. Nombre: {{ $json.body.nombre }}. Tipo de caso: {{ $json.body.tipo_caso }}. Notas: {{ $json.body.notas }}. Por favor genera un resumen organizado del caso y sugiere los próximos pasos."
+            },
+            {
+              "name": "contexto",
+              "value": "operativo"
+            },
+            {
+              "name": "modo",
+              "value": "pasos"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "procesar-intake",
+      "name": "Procesar con Asistente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.GOOGLE_SHEET_ID }}"
+        },
+        "sheetName": "Intakes",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ new Date().toISOString() }}",
+            "nombre": "={{ $('Formulario Intake').item.json.body.nombre }}",
+            "tipo_caso": "={{ $('Formulario Intake').item.json.body.tipo_caso }}",
+            "resumen_ia": "={{ $json.resumen }}",
+            "estado": "nuevo"
+          }
+        }
+      },
+      "id": "guardar-sheets",
+      "name": "Guardar en Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [710, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ estado: 'OK', mensaje: 'Intake procesado correctamente', resumen: $('Procesar con Asistente').item.json.resumen }) }}"
+      },
+      "id": "responder-intake",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [710, 400]
+    }
+  ],
+  "connections": {
+    "Formulario Intake": {
+      "main": [
+        [
+          {
+            "node": "Procesar con Asistente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar con Asistente": {
+      "main": [
+        [
+          {
+            "node": "Guardar en Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

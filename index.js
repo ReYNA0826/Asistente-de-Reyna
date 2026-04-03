@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import { rutasAsistente } from "./asistente.js";
 import { rutasSalud } from "./salud.js";
 
@@ -7,6 +8,7 @@ const app = express();
 const PUERTO = process.env.PORT || 3000;
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 // Rutas
