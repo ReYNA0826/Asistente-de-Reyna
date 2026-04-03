@@ -21,25 +21,18 @@ app.set('trust proxy', 1);
 
 // Seguridad
 app.use(helmet());
-21: 
-22: // Seguridad
-
-// Seguridad
-app.use(helmet());
 app.use(cors());
 
-// Límite de peticiones
+// Limite de peticiones
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
+  windowMs: 15 * 60 * 1000,
   max: 100,
-  message: { error: 'Demasiadas peticiones. Intenta de nuevo más tarde.' }
+  message: { error: 'Demasiadas peticiones. Intenta de nuevo mas tarde.' }
 });
 app.use('/api/', limiter);
 
-// Body parsing
 app.use(express.json({ limit: '10mb' }));
 
-// Rutas
 app.use('/api/conversacion', conversacionRoutes);
 app.use('/api/voz', vozRoutes);
 app.use('/api/correos', correosRoutes);
@@ -49,30 +42,17 @@ app.use('/api/avatar', avatarRoutes);
 app.use('/api/salud', saludRoutes);
 app.use('/api/monday', mondayRoutes);
 
-// Interfaz web
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// Manejo de errores global
 app.use((err, req, res, _next) => {
   console.error('[Alma Error]', err.message);
-  res.status(err.status || 500).json({
-    error: 'Algo salió mal. Alma está trabajando en ello.',
-    detalle: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
+  res.status(err.status || 500).json({ error: 'Algo salio mal.' });
 });
 
 app.listen(PORT, async () => {
-  console.log(`✨ Alma está lista en http://localhost:${PORT}`);
-  console.log(`📧 Correos: /api/correos`);
-  console.log(`🎤 Voz: /api/voz`);
-  console.log(`💬 Conversación: /api/conversacion`);
-  console.log(`⏰ Recordatorios: /api/recordatorios`);
-  console.log(`🎭 Avatar: /api/avatar`);
-  console.log(`📋 Monday.com: /api/monday`);
-
-  // Inicializar Supabase
+  console.log(`Alma lista en http://localhost:${PORT}`);
   const dbOk = await inicializarTablas();
-  console.log(dbOk ? '🗄️  Supabase: conectado' : '🗄️  Supabase: usando memoria local');
+  console.log(dbOk ? 'Supabase: conectado' : 'Supabase: memoria local');
 });
 
 module.exports = app;
