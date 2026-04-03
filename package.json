@@ -1,0 +1,25 @@
+{
+  "name": "asistente-de-reyna",
+  "version": "1.0.0",
+  "description": "Asistente Virtual de Reyna Vazquez — Elio Vazquez Immigration Law Team",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "asistente",
+    "inmigracion",
+    "legal",
+    "reyna"
+  ],
+  "author": "Reyna Vazquez",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "openai": "^6.33.0"
+  }
+}
