@@ -18,8 +18,8 @@
   "author": "Reyna Vazquez",
   "license": "ISC",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
     "dotenv": "^17.4.0",
-    "express": "^5.2.1",
-    "openai": "^6.33.0"
+    "express": "^5.2.1"
   }
 }

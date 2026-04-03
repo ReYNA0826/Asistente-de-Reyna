@@ -1,4 +1,4 @@
-import { generarRespuesta } from "./openaiService.js";
+import { generarRespuesta } from "./claudeService.js";
 import { guardarTemporal } from "./memoriaService.js";
 
 /**
